@@ -6,9 +6,16 @@ module.exports = function (ele, page) {
     	var ele = this.ele;
     	var page = this.page;
 
-    	// await page.waitForNavigation();
-    	
-		console.log(ele);
+        if(ele.type == "get_html") {
+            let selector = ele.selector;
+            await page.waitForNavigation();
+
+            return page.evaluate((selector) => {
+                let table = document.querySelector(''+selector);
+                if(table) return table.outerHTML;
+                else return '';
+            }, selector);
+        }
 
 	  	if(ele.type == "visit") {
 			let url = ele.url;
