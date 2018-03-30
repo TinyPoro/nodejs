@@ -17,6 +17,31 @@ module.exports = function (ele, page) {
             }, selector);
         }
 
+        if(ele.type == 'check_exist'){
+            let selector = ele.selector;
+
+            await page.on('console', msg => {
+                console.log(msg.text());
+            });
+
+            return page.evaluate((selector) => {
+                let lists = document.querySelectorAll(''+selector);
+
+                var urls = [];
+
+                lists.forEach(function(list, key){
+                    var url = list.innerHTML;
+                    var http = "https://";
+                    if(url.indexOf(http) == -1) url = "http://"+url;
+
+
+                    urls.push(url);
+                });
+
+                return urls;
+            }, selector);
+        }
+
 	  	if(ele.type == "visit") {
 			let url = ele.url;
 			return page.goto(ele.url);

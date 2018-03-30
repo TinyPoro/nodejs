@@ -31,7 +31,7 @@ http.createServer(async (req, res) => {
 	    	}
 	    	
 	    	if(s) {
-	    		const browser = await puppeteer.launch({headless:true});;
+	    		const browser = await puppeteer.launch({headless:false});;
 	    		const page = await browser.newPage();
 
 	    		//script
@@ -43,6 +43,42 @@ http.createServer(async (req, res) => {
                     if(ele.type == 'get_html') {
                     	var html = await scrMod.exeScript();
                         res.end(html);
+					}else if(ele.type == 'check_exist'){
+                    	var urls = await scrMod.exeScript();
+
+                    	await page.goto('http://spider.123dok.com:6769/site/create');
+
+                        await page.evaluate(() => {
+                            document.querySelector('#email').value = 'ngophuongtuan@gmail.com';
+                            document.querySelector('#password').value = 'tinyporo1817';
+                        });
+
+                        await page.click('[type="submit"]');
+
+                        try{
+                        	await page.waitForNavigation({timeout:3000});
+                        }catch(err){
+                        	console.log(err.message);
+						}
+                        await page.goto('http://spider.123dok.com:6769/site/create');
+                        var result = [];
+
+                        urls.forEach(async function(url, index){
+                        	let check = await page.evaluate((url) => {
+                        		document.querySelector('#start_url').value = url;
+                                let duplicate = document.querySelector('.list-report li input[type="radio"]');
+
+                                if(duplicate == null) return true;
+                                return false;
+                            }, url);
+
+                        	if(check) result.push(url);
+
+							if(index == urls.length - 1) {
+								var json_url = JSON.stringify(urls);
+								res.end(json_url);
+                            }
+                        });
 					}
                     else await scrMod.exeScript();
                 }
@@ -53,11 +89,7 @@ http.createServer(async (req, res) => {
 		    	success : false,
 		  		message : 'Không thể khởi động selenium/phantomjs/puppetee'
 		    }
-	    } 
-
-	    var json = JSON.stringify(obj);
-
-	  	res.end(json);
+	    }
   	})
 }).listen(8080);
 
