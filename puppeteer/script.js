@@ -66,5 +66,14 @@ module.exports = function (ele, page) {
                     }
 				});
 		}
+
+        if(ele.type == "result") {
+            return await page.evaluate(() => {
+                let result = document.querySelector('#resultStats');
+
+                if(result) return 'true';
+                else return 'false';
+            });
+        }
 	}
 };

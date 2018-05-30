@@ -44,7 +44,11 @@ http.createServer(async (req, res) => {
                         var html = await scrMod.exeScript();
                         await res.end(html);
                     }
-                    else await scrMod.exeScript();
+                    else if(ele.type == 'result'){
+                        var result = await scrMod.exeScript();
+                        console.log(result);
+                        await res.end(result);
+                    }else await scrMod.exeScript();
 
 
                 }
